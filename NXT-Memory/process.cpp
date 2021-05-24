@@ -1,8 +1,13 @@
-#include "proc.h"
+#include "process.h"
 
-uintptr_t getModuleBaseAddr64(const wchar_t* modName) {
+void Process::init(const wchar_t* modName) {
+    this->info = findProcInfo(modName);
+    this->baseAddr = getModuleBaseAddr64(modName, this->info.id);
+}
+
+uintptr_t Process::getModuleBaseAddr64(const wchar_t* modName, DWORD procId) {
 	DWORD_PTR   baseAddress = 0;
-	HANDLE      processHandle = OpenProcess(PROCESS_ALL_ACCESS, FALSE, findProcId(modName));
+	HANDLE      processHandle = OpenProcess(PROCESS_ALL_ACCESS, FALSE, procId);
 	HMODULE* moduleArray;
 	LPBYTE      moduleArrayBytes;
 	DWORD       bytesRequired;
@@ -33,15 +38,14 @@ uintptr_t getModuleBaseAddr64(const wchar_t* modName) {
 	return baseAddress;
 }
 
-uintptr_t getModuleBaseAddr32(const wchar_t* modName) {
+uintptr_t Process::getModuleBaseAddr32(const wchar_t* modName, DWORD procId) {
     uintptr_t modBaseAddr = 0;
-    HANDLE hSnap = CreateToolhelp32Snapshot(TH32CS_SNAPMODULE | TH32CS_SNAPMODULE32, findProcId(modName));
+    HANDLE hSnap = CreateToolhelp32Snapshot(TH32CS_SNAPMODULE | TH32CS_SNAPMODULE32, procId);
     if (hSnap != INVALID_HANDLE_VALUE) {
         MODULEENTRY32 modEntry;
         modEntry.dwSize = sizeof(modEntry);
         if (Module32First(hSnap, &modEntry)) {
             do {
-                printf("Checking module %ls\n", modEntry.szModule);
                 if (!_wcsicmp(modEntry.szModule, modName)) {
                     modBaseAddr = (uintptr_t)modEntry.modBaseAddr;
                     break;
@@ -53,15 +57,15 @@ uintptr_t getModuleBaseAddr32(const wchar_t* modName) {
     return modBaseAddr;
 }
 
-DWORD findProcId(const wchar_t* modName) {
+ProcInfo Process::findProcInfo(const wchar_t* modName) {
     HANDLE hProcessSnap;
     PROCESSENTRY32 pe32;
-    DWORD result = NULL;
+    ProcInfo info = { 0 };
 
     // Take a snapshot of all processes in the system.
     hProcessSnap = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
     if (INVALID_HANDLE_VALUE == hProcessSnap)
-        return (FALSE);
+        return info;
 
     pe32.dwSize = sizeof(PROCESSENTRY32); // <----- IMPORTANT
 
@@ -70,18 +74,18 @@ DWORD findProcId(const wchar_t* modName) {
     if (!Process32First(hProcessSnap, &pe32)) {
         CloseHandle(hProcessSnap); // clean the snapshot object
         printf("Failed to gather information on system processes! \n");
-        return (NULL);
+        return info;
     }
 
     do {
-        if (0 == _wcsicmp(modName, pe32.szExeFile)) {
-            result = pe32.th32ProcessID;
-            printf("Found process ID: %d\n", result);
+        if (!_wcsicmp(modName, pe32.szExeFile)) {
+            info.id = pe32.th32ProcessID;
+            info.handle = OpenProcess(PROCESS_ALL_ACCESS, NULL, info.id);
             break;
         }
     } while (Process32Next(hProcessSnap, &pe32));
 
     CloseHandle(hProcessSnap);
 
-    return result;
+    return info;
 }
