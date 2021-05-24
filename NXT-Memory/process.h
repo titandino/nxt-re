@@ -16,7 +16,7 @@ class Process {
 		void init(const wchar_t* modName);
 		template <typename ReadType> ReadType readMem(uintptr_t addr) {
 			ReadType Data;
-			if (ReadProcessMemory(this->info.handle, (LPVOID)(addr), &Data, sizeof(ReadType), 0)) {
+			if (ReadProcessMemory(this->info.handle, (LPVOID)(this->baseAddr + addr), &Data, sizeof(ReadType), 0)) {
 				return Data;
 			} else {
 				ReadType ayy = { 0 };
