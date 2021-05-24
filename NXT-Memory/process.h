@@ -23,6 +23,9 @@ class Process {
 				return ayy;
 			}
 		};
+		template <typename WriteType> bool writeMem(uintptr_t addr, WriteType val) {
+			return WriteProcessMemory(this->info.handle, (LPVOID)(this->baseAddr + addr), &val, sizeof(WriteType), 0);
+		};
 	private:
 		ProcInfo findProcInfo(const wchar_t* modName);
 		uintptr_t getModuleBaseAddr32(const wchar_t* modName, DWORD procId);

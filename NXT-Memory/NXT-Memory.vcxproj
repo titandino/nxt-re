@@ -144,6 +144,7 @@
     <ClCompile Include="process.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="app.h" />
     <ClInclude Include="offsets.h" />
     <ClInclude Include="process.h" />
   </ItemGroup>
