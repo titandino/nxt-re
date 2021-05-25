@@ -24,12 +24,18 @@ int main() {
     if (!disableMouseHook())
         return 1;
 
+    //Address of signature = rs2client.exe + 0x004EFF51
+    //uintptr_t scan1 = proc.scan("48 89 ? ? ? ? ? 80 BF B1 02 00 00", 0x500000);
+
+    //std::cout << "Scan1 mouse hook address: " << std::hex << scan1 << std::endl;
+    //std::cout << "Scan1 mouse hook address: " << std::hex << proc.readMem<DWORD>(scan1) << std::endl;
+
     return 0;
 }
 
 
 bool disableMouseHook() {
-    std::cout << "Disabling RS3 mouse movement hook..." << std::endl;
+    std::cout << "Disabling RS3 mouse hook..." << std::endl;
 
     HHOOK hookHandle = proc.readMem<HHOOK>(off_MouseWindowHook);
 
