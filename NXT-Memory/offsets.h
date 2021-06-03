@@ -1,11 +1,14 @@
 #pragma once
 
 //HHOOK hhk (SetWindowsHookEx)
-const int off_MouseWindowHook = 0x72EDC0;
+const int off_windowsHook = 0x9a5ff0;
+const char* off_windowsHookSig = "48 89 ? ? ? ? ? 80 BF B1 02 00 00";
 
 //WinMain DWORD* (above 0x2D000000500)
-const int off_EngineBase = 0x72E6F8;
+const int off_engineBase = 0x72E6F8;
 
-const int off_entity_X = 0xEC;
-const int off_entity_Y = 0xF0;
+const int off_entity_x = 0xEC;
+const int off_entity_y = 0xF0;
+const int off_entity_serverIdx = 0x110;
 const int off_entity_descAddr = 0x100;
+const int off_entity_npcId = 0xF58;

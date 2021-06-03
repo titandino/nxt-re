@@ -90,6 +90,14 @@ ProcInfo Process::findProcInfo(const wchar_t* modName) {
     return info;
 }
 
+uintptr_t Process::readAsmPtr(uintptr_t addr) {
+    uintptr_t data;
+    if (ReadProcessMemory(this->info.handle, (LPVOID)(this->baseAddr + addr), &data, 3, 0))
+        return data & 0xFFFFFF;
+    else
+        return 0;
+}
+
 char* Process::scanBasic(const char* pattern, const char* mask, char* begin, intptr_t size) {
     intptr_t patternLen = strlen(mask);
 
@@ -113,8 +121,8 @@ uintptr_t Process::scan(const char* cPattern, intptr_t size) {
     DWORD oldprotect;
     char* buffer{ nullptr };
     MEMORY_BASIC_INFORMATION mbi;
-    char pattern[100];
-    char mask[100];
+    char pattern[500];
+    char mask[500];
     mbi.RegionSize = 0x1000;
 
     parsePattern(cPattern, pattern, mask);

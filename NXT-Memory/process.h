@@ -23,6 +23,7 @@ class Process {
 				return ayy;
 			}
 		};
+		uintptr_t readAsmPtr(uintptr_t addr);
 		template <typename WriteType> bool writeMem(uintptr_t addr, WriteType val) {
 			return WriteProcessMemory(this->info.handle, (LPVOID)(this->baseAddr + addr), &val, sizeof(WriteType), 0);
 		};
