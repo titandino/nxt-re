@@ -1,7 +1,6 @@
 #pragma once
 
 //HHOOK hhk (SetWindowsHookEx)
-const int off_windowsHook = 0x9a5ff0;
 const char* off_windowsHookSig = "48 89 ? ? ? ? ? 80 BF B1 02 00 00";
 
 //WinMain DWORD* (above 0x2D000000500)
